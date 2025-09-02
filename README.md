@@ -96,7 +96,6 @@ Simply open `index.html` in your browser 🌐
 ---
 
 ## 📸 Screenshots
-> (Add screenshots or GIFs of gameplay here for recruiters)  
 
 | Main Menu | Rules Modal | Gameplay | Winner Screen |
 |-----------|-------------|----------|---------------|
@@ -122,10 +121,11 @@ I built this game to:
 ---
 
 ## 👨‍💻 Author
-**Bikram Tripathi**  
-🌐 Portfolio: [yourdomain.online](https://yourdomain.online)  
-💼 LinkedIn: [linkedin.com/in/yourprofile](#)  
-🐙 GitHub: [github.com/yourusername](#)  
+**Bikram Tripathi**
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-000?style=for-the-badge&logo=vercel&logoColor=white)](https://portfolio-website-yap5.onrender.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)](https://github.com/Funza07)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/bikram-tripathi-cse/)
 
 ---
 
