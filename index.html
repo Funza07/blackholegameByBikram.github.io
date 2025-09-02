@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Hole - Board Game</title>
+</head>
+<body>
+    <!-- Main Menu Screen -->
+    <div id="main-menu" class="screen active">
+        <div class="container">
+            <h1 class="game-title">Black Hole</h1>
+            <p class="game-subtitle">Strategy Board Game</p>
+            <div class="menu-buttons">
+                <button class="btn btn--primary btn--lg" id="two-players-btn">2 Players</button>
+                <button class="btn btn--primary btn--lg" id="three-players-btn">3 Players</button>
+                <button class="btn btn--secondary btn--lg" id="rules-btn">Rules</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Setup Screen -->
+    <div id="player-setup" class="screen">
+        <div class="container">
+            <h2>Player Setup</h2>
+            <div id="player-forms" class="player-forms">
+                <!-- Player forms will be generated dynamically -->
+            </div>
+            <div class="setup-actions">
+                <button class="btn btn--secondary" id="back-to-menu-btn">Back to Menu</button>
+                <button class="btn btn--primary" id="start-game-btn">Start Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="container">
+            <!-- Scoreboard -->
+            <div class="scoreboard">
+                <div class="current-turn">
+                    <span class="turn-label">Current Turn:</span>
+                    <span id="current-player" class="current-player"></span>
+                </div>
+                <div class="players-info" id="players-info">
+                    <!-- Player info will be generated dynamically -->
+                </div>
+                <div class="game-info">
+                    <span>Round: <span id="round-number">1</span></span>
+                </div>
+            </div>
+
+            <!-- Game Status -->
+            <div id="game-status" class="game-status">
+                <p id="status-message">Select a circle to claim it!</p>
+            </div>
+
+            <!-- Game Board -->
+            <div class="board-container">
+                <div id="game-board" class="game-board">
+                    <!-- Circles will be generated dynamically -->
+                </div>
+            </div>
+
+            <!-- Game Actions -->
+            <div class="game-actions">
+                <button class="btn btn--outline" id="new-game-btn">New Game</button>
+                <button class="btn btn--secondary" id="back-to-menu-game-btn">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Winner Modal -->
+    <div id="winner-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Game Over!</h3>
+            <div id="winner-announcement"></div>
+            <div id="winner-scores"></div>
+            <div id="calculation-breakdown"></div>
+            <div class="modal-actions">
+                <button class="btn btn--primary" id="play-again-btn">Play Again</button>
+                <button class="btn btn--secondary" id="menu-from-modal-btn">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Rules Modal -->
+  <div id="rules-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>How to Play Black Hole</h3>
+      <div class="rules-text">
+        <p>🎯 <strong>Objective</strong><br>
+        Be the player with the LOWEST sum of circles adjacent to the black hole.</p>
+
+        <p>⚙️ <strong>Setup</strong><br>
+        2 Players: 6 layers (21 circles)<br>
+        3 Players: 7 layers (28 circles)</p>
+
+        <p>🎮 <strong>Gameplay</strong><br>
+        Players take turns selecting circles. Each player's circles are numbered sequentially (1, 2, 3, etc.) in the order they claim them.</p>
+
+        <p>🕳️ <strong>Black Hole</strong><br>
+        The last remaining circle becomes the black hole and is removed from play.</p>
+
+        <p>📐 <strong>Adjacency</strong><br>
+        Circles are adjacent if they touch the black hole - same row, or diagonally above/below.</p>
+
+        <p>🏆 <strong>Winning</strong><br>
+        Add up the numbers on your circles that are adjacent to the black hole. Lowest total wins!</p>
+
+        <p>💡 <strong>Example</strong><br>
+        If your circles numbered 2, 5, and 8 are adjacent to the black hole, your score is 2 + 5 + 8 = 15 points.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--primary" id="close-rules-btn">Got It!</button>
+      </div>
+    </div>
+  </div>
+
+    <style>
+        /* Design System Base */
+        :root {
+            --color-primary: #218c8d;
+            --color-primary-hover: #1d747a;
+            --color-secondary: rgba(94, 82, 64, 0.12);
+            --color-surface: #fffffd;
+            --color-background: #fcfcf9;
+            --color-text: #13343b;
+            --color-text-secondary: #626c71;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-card-border: rgba(94, 82, 64, 0.12);
+            --color-success: #218c8d;
+            --color-white: #ffffff;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-size-4xl: 30px;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --font-weight-bold: 600;
+            --space-4: 4px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-sm: 6px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-size: var(--font-size-base);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-16);
+        }
+
+        /* Screen Management */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            padding: var(--space-32) 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-12) var(--space-20);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+            background: none;
+        }
+
+        .btn--primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn--primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn--secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+        }
+
+        .btn--outline {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn--lg {
+            padding: var(--space-16) var(--space-32);
+            font-size: var(--font-size-lg);
+        }
+
+        /* Form Elements */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            font-size: var(--font-size-base);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-16);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Main Menu */
+        #main-menu {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(147, 51, 234, 0.08));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: var(--font-weight-bold);
+            text-align: center;
+            margin: 0 0 var(--space-16) 0;
+            color: var(--color-primary);
+            user-select: none;
+        }
+
+        .game-subtitle {
+            text-align: center;
+            font-size: var(--font-size-xl);
+            color: var(--color-text-secondary);
+            margin: 0 0 var(--space-32) 0;
+            user-select: none;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-20);
+            align-items: center;
+        }
+
+        /* Player Setup */
+        #player-setup {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(34, 197, 94, 0.08));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #player-setup h2 {
+            text-align: center;
+            margin-bottom: var(--space-32);
+            font-size: var(--font-size-3xl);
+        }
+
+        .player-forms {
+            display: grid;
+            gap: var(--space-24);
+            margin-bottom: var(--space-32);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .player-form {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .player-form h3 {
+            margin: 0 0 var(--space-16) 0;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-8);
+            margin-top: var(--space-8);
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-base);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--color-text);
+            transform: scale(1.15);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--color-white);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .setup-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-16);
+        }
+
+        /* Game Screen */
+        #game-screen {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(6, 182, 212, 0.08));
+            padding-top: var(--space-20);
+        }
+
+        .scoreboard {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-24);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-sm);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: var(--space-20);
+            align-items: center;
+        }
+
+        .current-turn {
+            text-align: center;
+        }
+
+        .turn-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-4);
+        }
+
+        .current-player {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .players-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+            font-size: var(--font-size-sm);
+        }
+
+        .player-color {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+
+        .game-info {
+            text-align: center;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .game-status {
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+
+        #status-message {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text);
+        }
+
+        /* CRITICAL: Game Board - FIXED */
+        .board-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-12);
+            padding: var(--space-32);
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-lg);
+            min-width: 400px;
+        }
+
+        .board-row {
+            display: flex;
+            gap: var(--space-12);
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CRITICAL: Circle Styles - COMPLETELY FIXED */
+        .circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--color-primary);
+            background: var(--color-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+            color: var(--color-text);
+            position: relative;
+            z-index: 1;
+        }
+
+        .circle:hover:not(.claimed) {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-primary-hover);
+            background: var(--color-secondary);
+        }
+
+        .circle.claimed {
+            cursor: default;
+            color: var(--color-white) !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            border-width: 2px;
+        }
+
+        .circle.claimed:hover {
+            transform: scale(1.05);
+        }
+
+        .circle.black-hole {
+            background: linear-gradient(135deg, #333, #000) !important;
+            border-color: #666 !important;
+            color: var(--color-white) !important;
+            font-size: var(--font-size-2xl);
+        }
+
+        .circle.adjacent-highlight {
+            box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.9) !important;
+            animation: pulse 1.5s infinite;
+            z-index: 10 !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.9);
+            }
+            50% { 
+                transform: scale(1.08);
+                box-shadow: 0 0 0 8px rgba(255, 215, 0, 0.7);
+            }
+        }
+
+        .game-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-16);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .modal-content {
+            background: var(--color-surface);
+            padding: var(--space-32);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            font-size: var(--font-size-3xl);
+            margin: 0 0 var(--space-20) 0;
+            color: var(--color-primary);
+        }
+
+        #winner-announcement {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+        }
+
+        #winner-scores {
+            margin-bottom: var(--space-24);
+        }
+
+        #calculation-breakdown {
+            background: var(--color-secondary);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            margin-bottom: var(--space-24);
+            text-align: left;
+        }
+
+        .breakdown-section {
+            margin-bottom: var(--space-12);
+        }
+
+        .breakdown-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        .player-calculation {
+            margin-bottom: var(--space-8);
+            padding: var(--space-8);
+            border-radius: var(--radius-sm);
+            background: var(--color-surface);
+        }
+
+        .rules-text {
+            text-align: left;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            margin-bottom: var(--space-24);
+        }
+
+        .rules-text p {
+            margin-bottom: var(--space-16);
+        }
+
+
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-8);
+            margin: var(--space-4) 0;
+            border-radius: var(--radius-sm);
+            background: var(--color-secondary);
+        }
+
+        .score-item.winner {
+            background: rgba(34, 197, 94, 0.08);
+            border: 2px solid var(--color-success);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--space-16);
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .scoreboard {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .circle {
+                width: 50px;
+                height: 50px;
+                font-size: var(--font-size-lg);
+            }
+            
+            .game-board {
+                gap: var(--space-8);
+                padding: var(--space-20);
+            }
+            
+            .board-row {
+                gap: var(--space-8);
+            }
+        }
+    </style>
+
+    <script>
+        console.log('🎮 Black Hole Game Starting...');
+
+        // Game Configuration
+        const GAME_CONFIG = {
+            2: { layers: 6, totalCircles: 21 },
+            3: { layers: 7, totalCircles: 28 }
+        };
+
+        const PLAYER_COLORS = ['#FF4444', '#4444FF', '#44FF44', '#FFFF44', '#FF44FF', '#44FFFF'];
+
+        // Game State
+        let gameState = {
+            playerCount: 0,
+            players: [],
+            currentPlayerIndex: 0,
+            board: [],
+            gameActive: false,
+            turnNumber: 1,
+            roundNumber: 1,
+            sessionScores: {},
+            initialized: false
+        };
+
+        // DOM Elements - initialized immediately
+        const elements = {
+            mainMenu: document.getElementById('main-menu'),
+            playerSetup: document.getElementById('player-setup'),
+            gameScreen: document.getElementById('game-screen'),
+            twoPlayersBtn: document.getElementById('two-players-btn'),
+            threePlayersBtn: document.getElementById('three-players-btn'),
+            backToMenuBtn: document.getElementById('back-to-menu-btn'),
+            startGameBtn: document.getElementById('start-game-btn'),
+            playerForms: document.getElementById('player-forms'),
+            currentPlayer: document.getElementById('current-player'),
+            playersInfo: document.getElementById('players-info'),
+            roundNumber: document.getElementById('round-number'),
+            statusMessage: document.getElementById('status-message'),
+            gameBoard: document.getElementById('game-board'),
+            newGameBtn: document.getElementById('new-game-btn'),
+            backToMenuGameBtn: document.getElementById('back-to-menu-game-btn'),
+            winnerModal: document.getElementById('winner-modal'),
+            winnerAnnouncement: document.getElementById('winner-announcement'),
+            winnerScores: document.getElementById('winner-scores'),
+            calculationBreakdown: document.getElementById('calculation-breakdown'),
+            playAgainBtn: document.getElementById('play-again-btn'),
+            menuFromModalBtn: document.getElementById('menu-from-modal-btn'),
+            rulesBtn: document.getElementById('rules-btn'),
+            rulesModal: document.getElementById('rules-modal'),
+            closeRulesBtn: document.getElementById('close-rules-btn')
+        };
+
+        // CRITICAL: Event Listeners Setup - FIXED
+        function setupEventListeners() {
+            console.log('🎧 Setting up event listeners...');
+            
+            // Main menu buttons - FIXED with proper binding
+            elements.twoPlayersBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🎯 2 Players selected');
+                startSetup(2);
+            });
+            
+            elements.threePlayersBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🎯 3 Players selected');
+                startSetup(3);
+            });
+            
+            elements.backToMenuBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('mainMenu');
+            });
+            
+            elements.startGameBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🎯 Start game clicked');
+                startGame();
+            });
+            
+            elements.newGameBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                startNewRound();
+            });
+            
+            elements.backToMenuGameBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('mainMenu');
+            });
+            
+            elements.playAgainBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                hideModal();
+                startNewRound();
+            });
+            
+            elements.menuFromModalBtn?.addEventListener('click', function(e) {
+                e.preventDefault();
+                hideModal();
+                showScreen('mainMenu');
+            });
+
+             elements.rulesBtn?.addEventListener('click', e => {
+                e.preventDefault();
+                elements.rulesModal.classList.remove('hidden');
+            });
+            elements.closeRulesBtn?.addEventListener('click', e => {
+                e.preventDefault();
+                elements.rulesModal.classList.add('hidden');
+            });
+        }
+
+        // Screen Management
+        function showScreen(screenName) {
+            console.log(`📺 Showing screen: ${screenName}`);
+            
+            // Hide all screens
+            ['mainMenu', 'playerSetup', 'gameScreen'].forEach(screen => {
+                elements[screen]?.classList.remove('active');
+            });
+            
+            // Show requested screen
+            elements[screenName]?.classList.add('active');
+            
+            if (screenName === 'mainMenu') {
+                resetGameState();
+            }
+        }
+
+        function resetGameState() {
+            gameState.gameActive = false;
+            gameState.board = [];
+            if (elements.gameBoard) {
+                elements.gameBoard.innerHTML = '';
+            }
+        }
+
+        // Setup Functions - FIXED
+        function startSetup(playerCount) {
+            console.log(`⚙️ Starting setup for ${playerCount} players`);
+            gameState.playerCount = playerCount; // CRITICAL: Fix player count assignment
+            generatePlayerSetupForm();
+            showScreen('playerSetup');
+        }
+
+        function generatePlayerSetupForm() {
+            if (!elements.playerForms) return;
+            
+            elements.playerForms.innerHTML = '';
+            
+            // CRITICAL: Use correct player count
+            for (let i = 0; i < gameState.playerCount; i++) {
+                const playerForm = document.createElement('div');
+                playerForm.className = 'player-form';
+                playerForm.innerHTML = `
+                    <h3>Player ${i + 1}</h3>
+                    <div class="form-group">
+                        <label class="form-label">Name:</label>
+                        <input type="text" class="form-control" id="player-${i}-name" 
+                               placeholder="Enter player name" value="Player ${i + 1}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Color:</label>
+                        <div class="color-picker" id="player-${i}-colors">
+                            ${PLAYER_COLORS.map((color, index) => 
+                                `<div class="color-option ${index === i ? 'selected' : ''}" 
+                                      style="background-color: ${color}" 
+                                      data-color="${color}"></div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+                elements.playerForms.appendChild(playerForm);
+                
+                // Add color selection listeners
+                const colorOptions = playerForm.querySelectorAll('.color-option');
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        selectColor(i, option);
+                    });
+                });
+            }
+        }
+
+        function selectColor(playerIndex, selectedOption) {
+            const colorPicker = document.getElementById(`player-${playerIndex}-colors`);
+            if (colorPicker) {
+                colorPicker.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                selectedOption.classList.add('selected');
+            }
+        }
+
+        // CRITICAL: Game Logic - FIXED
+        function startGame() {
+            console.log('🎮 Starting game...');
+            
+            // Validate setup
+            if (!validatePlayerSetup()) {
+                alert('Please ensure all players have selected different colors.');
+                return;
+            }
+            
+            // Collect player data
+            gameState.players = [];
+            for (let i = 0; i < gameState.playerCount; i++) {
+                const nameInput = document.getElementById(`player-${i}-name`);
+                const colorElement = document.querySelector(`#player-${i}-colors .color-option.selected`);
+                
+                if (!nameInput || !colorElement) {
+                    alert('Setup error. Please try again.');
+                    return;
+                }
+                
+                const name = nameInput.value || `Player ${i + 1}`;
+                const color = colorElement.dataset.color;
+                
+                gameState.players.push({
+                    name: name,
+                    color: color,
+                    numbers: [],
+                    score: 0,
+                    adjacentCircles: []
+                });
+                
+                if (!gameState.sessionScores[name]) {
+                    gameState.sessionScores[name] = 0;
+                }
+            }
+            
+            console.log('👥 Players:', gameState.players.map(p => ({name: p.name, color: p.color})));
+            initializeGame();
+            showScreen('gameScreen');
+        }
+
+        function validatePlayerSetup() {
+            const selectedColors = [];
+            for (let i = 0; i < gameState.playerCount; i++) {
+                const colorElement = document.querySelector(`#player-${i}-colors .color-option.selected`);
+                if (!colorElement) return false;
+                
+                const color = colorElement.dataset.color;
+                if (selectedColors.includes(color)) return false;
+                selectedColors.push(color);
+            }
+            return true;
+        }
+
+        function initializeGame() {
+            console.log('🎲 Initializing game...');
+            
+            gameState.currentPlayerIndex = 0;
+            gameState.turnNumber = 1;
+            gameState.gameActive = true;
+            
+            // Reset player data
+            gameState.players.forEach(player => {
+                player.numbers = [];
+                player.score = 0;
+                player.adjacentCircles = [];
+            });
+            
+            generateBoard();
+            updateUI();
+        }
+
+        // CRITICAL: Board Generation - FIXED
+        function generateBoard() {
+            console.log('🏗️ Generating board...');
+            
+            if (!elements.gameBoard) {
+                console.error('❌ Game board element not found!');
+                return;
+            }
+            
+            const config = GAME_CONFIG[gameState.playerCount];
+            console.log(`📋 Creating ${config.layers} layers, ${config.totalCircles} total circles`);
+            
+            // Clear existing board
+            gameState.board = [];
+            elements.gameBoard.innerHTML = '';
+            
+            let circleIndex = 0;
+            
+            // Generate each layer
+            for (let layer = 1; layer <= config.layers; layer++) {
+                const row = document.createElement('div');
+                row.className = 'board-row';
+                
+                // Generate circles for this layer
+                for (let position = 0; position < layer; position++) {
+                    // Create circle data
+                    const circle = {
+                        id: circleIndex,
+                        layer: layer,
+                        position: position,
+                        claimed: false,
+                        player: null,
+                        number: null
+                    };
+                    
+                    // Create circle DOM element
+                    const circleElement = document.createElement('div');
+                    circleElement.className = 'circle';
+                    circleElement.dataset.id = circleIndex.toString();
+                    circleElement.textContent = '';
+                    
+                    // CRITICAL: Fixed event binding
+                    const circleId = circleIndex;
+                    circleElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`🎯 Circle ${circleId} clicked!`);
+                        claimCircle(circleId);
+                    });
+                    
+                    // Add to DOM and state
+                    row.appendChild(circleElement);
+                    gameState.board.push(circle);
+                    circleIndex++;
+                }
+                
+                elements.gameBoard.appendChild(row);
+            }
+            
+            console.log(`🎯 Board generated: ${circleIndex} circles created`);
+        }
+
+        // CRITICAL: Circle Claiming - FIXED
+        function claimCircle(circleId) {
+            console.log(`🎯 CLAIMING CIRCLE ${circleId}`);
+            
+            // Validation
+            if (!gameState.gameActive) {
+                console.log('❌ Game not active');
+                return;
+            }
+            
+            const circle = gameState.board[circleId];
+            if (!circle) {
+                console.error(`❌ Circle ${circleId} not found`);
+                return;
+            }
+            
+            if (circle.claimed) {
+                console.log(`❌ Circle ${circleId} already claimed`);
+                return;
+            }
+            
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            const playerNumber = currentPlayer.numbers.length + 1;
+            
+            console.log(`✅ Player ${currentPlayer.name} claiming circle ${circleId} with number ${playerNumber}`);
+            
+            // Update game state
+            circle.claimed = true;
+            circle.player = gameState.currentPlayerIndex;
+            circle.number = playerNumber;
+            currentPlayer.numbers.push(circleId);
+            
+            // Update visual
+            const circleElement = document.querySelector(`[data-id="${circleId}"]`);
+            if (circleElement) {
+                circleElement.style.backgroundColor = currentPlayer.color;
+                circleElement.style.borderColor = currentPlayer.color;
+                circleElement.textContent = playerNumber.toString();
+                circleElement.classList.add('claimed');
+                console.log(`🎨 Circle ${circleId} visual updated`);
+            }
+            
+            // CRITICAL: Fixed game end detection
+            const unclaimedCircles = gameState.board.filter(c => !c.claimed);
+            console.log(`📊 Remaining unclaimed circles: ${unclaimedCircles.length}`);
+            
+            if (unclaimedCircles.length === 1) {
+                console.log('🏁 Game ending - only one circle remains!');
+                setTimeout(() => {
+                    endGame(unclaimedCircles[0]);
+                }, 500);
+                return;
+            }
+            
+            // Next turn
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.playerCount;
+            gameState.turnNumber++;
+            
+            updateUI();
+        }
+
+        // CRITICAL: Game End Logic - FIXED
+        function endGame(blackHoleCircle) {
+            console.log('🏁 Ending game...');
+            gameState.gameActive = false;
+            
+            // Mark black hole
+            blackHoleCircle.claimed = true;
+            const blackHoleElement = document.querySelector(`[data-id="${blackHoleCircle.id}"]`);
+            if (blackHoleElement) {
+                blackHoleElement.style.backgroundColor = '#000';
+                blackHoleElement.style.borderColor = '#666';
+                blackHoleElement.textContent = '●';
+                blackHoleElement.classList.add('black-hole');
+            }
+            
+            console.log(`🕳️ Black hole: Circle ${blackHoleCircle.id} (layer ${blackHoleCircle.layer}, pos ${blackHoleCircle.position})`);
+            
+            // Calculate scores
+            calculateScores(blackHoleCircle);
+            
+            // Find winner (lowest score)
+            let winner = gameState.players[0];
+            gameState.players.forEach(player => {
+                if (player.score < winner.score) {
+                    winner = player;
+                }
+            });
+            
+            gameState.sessionScores[winner.name]++;
+            
+            console.log('🏆 Winner:', winner.name, 'Score:', winner.score);
+            
+            // Highlight adjacent circles
+            highlightAdjacentCircles(blackHoleCircle.layer, blackHoleCircle.position);
+            
+            // Show modal after highlighting
+            setTimeout(() => {
+                showWinnerModal(winner);
+            }, 1000);
+        }
+
+        // Score calculation and adjacency functions (same as before)
+        function calculateScores(blackHoleCircle) {
+            console.log('🔢 Calculating scores...');
+            
+            const adjacentIds = getAdjacentCircles(blackHoleCircle.layer, blackHoleCircle.position);
+            console.log(`🔗 Adjacent circles:`, adjacentIds);
+            
+            // Reset scores
+            gameState.players.forEach(player => {
+                player.score = 0;
+                player.adjacentCircles = [];
+            });
+            
+            // Calculate scores
+            adjacentIds.forEach(circleId => {
+                const circle = gameState.board[circleId];
+                if (circle && circle.claimed && circle.player !== null) {
+                    const player = gameState.players[circle.player];
+                    player.score += circle.number;
+                    player.adjacentCircles.push({
+                        id: circleId,
+                        number: circle.number
+                    });
+                    console.log(`✅ ${player.name} gets ${circle.number} points from circle ${circleId}`);
+                }
+            });
+            
+            gameState.players.forEach(player => {
+                console.log(`📊 ${player.name} final score: ${player.score}`);
+            });
+        }
+
+        function getAdjacentCircles(blackHoleLayer, blackHolePosition) {
+            const adjacent = [];
+            const config = GAME_CONFIG[gameState.playerCount];
+            
+            const adjacentPositions = [
+                { layer: blackHoleLayer, pos: blackHolePosition - 1 },
+                { layer: blackHoleLayer, pos: blackHolePosition + 1 },
+                { layer: blackHoleLayer - 1, pos: blackHolePosition - 1 },
+                { layer: blackHoleLayer - 1, pos: blackHolePosition },
+                { layer: blackHoleLayer + 1, pos: blackHolePosition },
+                { layer: blackHoleLayer + 1, pos: blackHolePosition + 1 }
+            ];
+            
+            adjacentPositions.forEach(adj => {
+                if (adj.layer >= 1 && adj.layer <= config.layers && 
+                    adj.pos >= 0 && adj.pos < adj.layer) {
+                    
+                    const circleId = getCircleIdFromLayerPosition(adj.layer, adj.pos);
+                    if (circleId !== -1 && circleId < gameState.board.length) {
+                        adjacent.push(circleId);
+                    }
+                }
+            });
+            
+            return adjacent;
+        }
+
+        function getCircleIdFromLayerPosition(layer, position) {
+            if (layer < 1) return -1;
+            
+            let id = 0;
+            for (let l = 1; l < layer; l++) {
+                id += l;
+            }
+            return id + position;
+        }
+
+        function highlightAdjacentCircles(blackHoleLayer, blackHolePosition) {
+            console.log(`🌟 Highlighting adjacent circles`);
+            
+            const adjacentIds = getAdjacentCircles(blackHoleLayer, blackHolePosition);
+            console.log(`🎯 Highlighting circles:`, adjacentIds);
+            
+            adjacentIds.forEach(id => {
+                const element = document.querySelector(`[data-id="${id}"]`);
+                if (element) {
+                    element.classList.add('adjacent-highlight');
+                    console.log(`✨ Added golden glow to circle ${id}`);
+                }
+            });
+        }
+
+        function showWinnerModal(winner) {
+            if (!elements.winnerModal || !elements.winnerAnnouncement || 
+                !elements.winnerScores || !elements.calculationBreakdown) return;
+            
+            elements.winnerAnnouncement.innerHTML = `
+                <div style="color: ${winner.color}; font-size: 2rem; margin-bottom: 1rem;">
+                    🎉 ${winner.name} Wins! 🎉
+                </div>
+                <div>Lowest score: ${winner.score} points</div>
+            `;
+            
+            const scoresHTML = gameState.players
+                .sort((a, b) => a.score - b.score)
+                .map(player => `
+                    <div class="score-item ${player === winner ? 'winner' : ''}">
+                        <span style="color: ${player.color};">
+                            <span class="player-color" style="background-color: ${player.color}"></span>
+                            ${player.name}
+                        </span>
+                        <span>${player.score} points (${gameState.sessionScores[player.name] || 0} wins)</span>
+                    </div>
+                `).join('');
+            
+            elements.winnerScores.innerHTML = scoresHTML;
+            
+            // Detailed calculation breakdown
+            let breakdownHTML = '<div class="breakdown-section">';
+            breakdownHTML += '<div class="breakdown-title">🔢 Score Calculation:</div>';
+            
+            gameState.players.forEach(player => {
+                if (player.adjacentCircles.length > 0) {
+                    const numbers = player.adjacentCircles.map(c => c.number);
+                    const calculation = numbers.join(' + ');
+                    breakdownHTML += `
+                        <div class="player-calculation">
+                            <strong style="color: ${player.color};">${player.name}:</strong><br>
+                            Adjacent circles: [${numbers.join(', ')}]<br>
+                            Calculation: ${calculation} = <strong>${player.score} points</strong>
+                        </div>
+                    `;
+                } else {
+                    breakdownHTML += `
+                        <div class="player-calculation">
+                            <strong style="color: ${player.color};">${player.name}:</strong><br>
+                            No adjacent circles = <strong>0 points</strong>
+                        </div>
+                    `;
+                }
+            });
+            
+            breakdownHTML += '</div>';
+            elements.calculationBreakdown.innerHTML = breakdownHTML;
+            
+            elements.winnerModal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            elements.winnerModal?.classList.add('hidden');
+        }
+
+        function startNewRound() {
+            console.log('🔄 Starting new round...');
+            gameState.roundNumber++;
+            
+            // Clear highlights
+            document.querySelectorAll('.circle').forEach(circle => {
+                circle.classList.remove('adjacent-highlight');
+            });
+            
+            initializeGame();
+        }
+
+        function updateUI() {
+            if (gameState.players.length > 0) {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                
+                if (elements.currentPlayer) {
+                    elements.currentPlayer.textContent = currentPlayer.name;
+                    elements.currentPlayer.style.color = currentPlayer.color;
+                }
+                
+                if (elements.playersInfo) {
+                    elements.playersInfo.innerHTML = gameState.players.map(player => `
+                        <div class="player-info">
+                            <div class="player-color" style="background-color: ${player.color}"></div>
+                            <span>${player.name} (${gameState.sessionScores[player.name] || 0} wins)</span>
+                        </div>
+                    `).join('');
+                }
+                
+                if (elements.roundNumber) {
+                    elements.roundNumber.textContent = gameState.roundNumber.toString();
+                }
+                
+                if (gameState.gameActive && elements.statusMessage) {
+                    elements.statusMessage.textContent = `${currentPlayer.name}'s turn - Select a circle!`;
+                }
+            }
+        }
+
+        // CRITICAL: Initialize when DOM loads - FIXED
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 DOM loaded, initializing game...');
+            
+            // Wait a bit to ensure all elements are ready
+            setTimeout(() => {
+                setupEventListeners();
+                gameState.initialized = true;
+                console.log('🎮 Black Hole game ready!');
+            }, 100);
+        });
+
+        // Debug helper
+        window.gameState = gameState;
+        console.log('🐛 Game state available in window.gameState for debugging');
+    </script>
+</body>
+</html>
